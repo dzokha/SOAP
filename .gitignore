@@ -1,0 +1,26 @@
+# Dataset & input files
+documents/
+dataset/
+input/
+*.pcap
+*.pcapng
+*.csv
+*.log
+*.dat
+
+# Secrets & configs
+.env
+*.key
+*.pem
+config.yaml
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+.vscode/
+Thumbs.db
+
+
