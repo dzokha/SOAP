@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> <head>
+    <meta charset="UTF-8">
+    <title>FastQC Web Interface</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 50px; text-align: center; }
+        .upload-box { border: 2px dashed #ccc; padding: 20px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <h1>FastQC Online Analysis</h1>
+    <div class="upload-box">
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Analyze Now</button>
+    </div>
+    <div id="result" style="margin-top: 20px; font-weight: bold;"></div>
+
+    <div id="gc-chart-container" style="background: #f9f9f9; border: 1px solid #ddd; padding: 10px;">
+    </div>
+
+    <script th:src="@{/js/chart-logic.js}"></script>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) return alert("Please select a file!");
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            document.getElementById('result').innerText = "Analyzing... please wait...";
+
+            const response = await fetch('/api/v1/fastqc/analyze', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

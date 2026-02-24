@@ -1,5 +1,6 @@
 # Compiled files
 /bin/
+/Guide/
 
 # Compiled class file
 *.class
