@@ -1,6 +1,8 @@
 # Compiled files
 /bin/
 /Guide/
+/logs/
+/target/
 
 # Compiled class file
 *.class
