@@ -1,35 +1,98 @@
 # SOAP
-Sequence Optimization and Alignment Program
+SOAP: Sequence Optimization and Alignment Program
 
-**A Quality Control application for FastQ files**
+# FastQC: Kiểm soát chất lượng dữ liệu giải trình tự (QC)
 
-FastQC is a program designed to spot potential problems in high througput sequencing datasets.  It runs a set of analyses on one or more raw sequence files in fastq or bam format and produces a report which summarises the results.
+**Ứng dụng phân tích và kiểm soát chất lượng cho các tệp FastQ**
 
-![FastQC Screenshot](Help/fastqc.png)
+FastQC là một công cụ được thiết kế để phát hiện các vấn đề tiềm ẩn trong các tập dữ liệu **giải trình tự hiệu năng cao (High-Throughput Sequencing)**. Chương trình thực hiện một loạt các phân tích trên một hoặc nhiều tệp trình tự thô ở định dạng **FastQ** hoặc **BAM** và tạo ra một báo cáo tổng hợp kết quả.
 
-FastQC will highlight any areas where this library looks unusual and where you should take a closer look. The program is not tied to any specific type of sequencing technique and can be used to look at libraries coming from a large number of different experiment types (Genomic Sequencing, ChIP-Seq, RNA-Seq, BS-Seq etc etc).
+FastQC sẽ làm nổi bật bất kỳ khu vực nào mà thư viện dữ liệu có dấu hiệu bất thường, giúp người dùng có cái nhìn chi tiết hơn về chất lượng dữ liệu trước khi tiến hành các bước phân tích sâu hơn.
 
-## Introduction
+Công cụ này **không phụ thuộc vào bất kỳ công nghệ giải trình tự cụ thể nào**, vì vậy có thể được sử dụng để kiểm tra các thư viện từ nhiều loại thí nghiệm khác nhau, ví dụ:
 
-Most high throughput sequencers generate output in FastQ format.  This format combines the base calls for the sequence which was generated with an encoded quality value for each base which says how confident the sequencer was that the base call generated was correct.
+- Genomic Sequencing
+- ChIP-Seq
+- RNA-Seq
+- BS-Seq
+- và các loại dữ liệu NGS khác
 
-Before proceeding with the analysis of a sequence data set it is a good idea to do some basic quality control checks on the raw data to ensure that there are no hidden problems which might be more difficult to detect at a later stage.
+---
 
-FastQC is an application which takes a FastQ file and runs a series of tests on it to generate a comprehensive QC report.  This will tell you if there is anything unusual about your sequence.  Each test is flagged as a pass, warning or fail depending on how far it departs from what you'd expect from a normal large dataset with no significant biases.  It's important to stress that warnings or even failures do not necessarily mean that there is a problem with your data, only that it is unusual.  It is possible that the biological nature of your sample means that you would expect this particular bias in your results.
+# Giới thiệu (Introduction)
 
-FastQC can be run either as an interactive graphical application which allows you to view results for multiple files in a single application.  Alternatively you can run the program in a non interactive way (say as part of a pipeline) which will generate an HTML report for each file you process.
+Hầu hết các máy giải trình tự hiện đại đều tạo ra dữ liệu đầu ra ở **định dạng FastQ**.  
 
-FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment.
-Having said that we've only tested in on Windows, MacOSX and Linux running the Oracle v1.6 to 1.8 JREs.  Please let us know what happened if you try running it on other platforms / JREs.  Please see the detailed instructions in the INSTALL.txt document to tell you how to get a suitable java version to run FastQC on your system.
+Định dạng này kết hợp:
 
-## Installation
+- **Base calls (xác định bazơ)** – trình tự nucleotide được đọc
+- **Quality scores (điểm chất lượng)** – giá trị được mã hóa cho từng bazơ, biểu thị mức độ tin cậy của máy giải trình tự đối với độ chính xác của bazơ đó.
 
-Please see the [installation instructions](INSTALL.md) in this repository.
+Trước khi thực hiện các bước phân tích sâu hơn (alignment, variant calling, expression analysis…), việc **kiểm tra chất lượng dữ liệu thô** là một bước rất quan trọng. Điều này giúp phát hiện sớm các vấn đề tiềm ẩn có thể ảnh hưởng đến kết quả phân tích sau này.
 
-## Contributions
+FastQC tiếp nhận tệp **FastQ** và thực hiện một chuỗi các phép kiểm tra để tạo ra **báo cáo QC toàn diện**.
 
-If you have any comments about FastQC we would like to hear them.  You can either enter them into the github bug tracker at:
+Mỗi phép kiểm tra sẽ được đánh dấu theo ba mức:
 
-https://github.com/dzokha/FastQC/issues/
+- **Pass** – Dữ liệu đạt tiêu chuẩn
+- **Warning** – Có dấu hiệu bất thường cần xem xét
+- **Fail** – Sai lệch rõ rệt so với dữ liệu chuẩn
 
-..or send them directly to dzokha1010@gmail.com.
+---
+
+> [!IMPORTANT]  
+> Các cảnh báo hoặc thậm chí là lỗi **không nhất thiết có nghĩa là dữ liệu của bạn có vấn đề**.  
+> Chúng chỉ cho thấy dữ liệu có đặc điểm khác với một tập dữ liệu chuẩn thông thường.  
+> Trong nhiều trường hợp, **đặc tính sinh học của mẫu** chính là nguyên nhân tạo ra các sai lệch (bias) này.
+
+---
+
+# Các chế độ sử dụng FastQC
+
+FastQC có thể được sử dụng theo hai cách:
+
+### 1. Ứng dụng đồ họa tương tác (Graphical Interface)
+
+- Cho phép người dùng mở và xem **nhiều tệp cùng lúc**
+- Hiển thị các biểu đồ QC trực quan
+- Phù hợp để kiểm tra dữ liệu nhanh trước khi phân tích
+
+### 2. Chế độ không tương tác (Command Line)
+
+- Chạy FastQC thông qua **dòng lệnh**
+- Phù hợp để tích hợp vào **pipeline phân tích dữ liệu NGS**
+- Tự động tạo **báo cáo HTML** cho mỗi tệp được xử lý
+
+---
+
+# Tính tương thích hệ thống
+
+FastQC là một ứng dụng **đa nền tảng**, được viết bằng **Java**.
+
+Về lý thuyết, chương trình có thể chạy trên bất kỳ hệ điều hành nào có **Java Runtime Environment (JRE)** phù hợp.
+
+FastQC hiện đã được kiểm thử ổn định trên:
+
+- **Windows**
+- **macOS**
+- **Linux**
+
+với các phiên bản **JRE từ v1.6 đến v21**.
+
+---
+
+# Cài đặt (Installation)
+
+Vui lòng tham khảo hướng dẫn cài đặt chi tiết trong **kho lưu trữ của dự án**.
+
+---
+
+# Đóng góp ý kiến (Contributions)
+
+Mọi ý kiến đóng góp hoặc phản hồi về FastQC đều được trân trọng.
+
+Bạn có thể:
+
+- Gửi báo cáo lỗi hoặc đề xuất tính năng thông qua **GitHub Issue Tracker**
+- Hoặc liên hệ trực tiếp qua email:
+
