@@ -6,7 +6,6 @@
 
 Với khả năng xử lý mạnh mẽ các định dạng dữ liệu thô như **FastQ** và **BAM**, SOAP cung cấp cái nhìn chi tiết về chất lượng thư viện, giúp các nhà nghiên cứu phát hiện sớm các sai sót kỹ thuật trước khi tiến hành các phân tích hạ nguồn phức tạp.
 
----
 
 # Giới thiệu hệ thống
 
@@ -20,15 +19,12 @@ Mỗi báo cáo từ SOAP được trực quan hóa thông qua hệ thống **ch
 - ⚠️ **Warning (Cảnh báo):** Có dấu hiệu bất thường (ví dụ: định kiến mồi ngẫu nhiên hoặc nhiễm adapter nhẹ).
 - ❌ **Fail (Thất bại):** Dữ liệu có sai lệch nghiêm trọng, cần xử lý hoặc giải trình tự lại.
 
----
-
 # Các tính năng cốt lõi
 
 ## 1. Phân tích chất lượng theo thời gian thực
 
 SOAP đo lường **điểm chất lượng Phred** tại mỗi chu kỳ giải trình tự, giúp xác định chính xác **thời điểm tín hiệu bắt đầu suy giảm** trong quá trình chạy máy.
 
----
 
 ## 2. Nhận diện tạp nhiễm (Contamination Detection)
 
@@ -40,7 +36,6 @@ Hệ thống tự động đối chiếu các **trình tự xuất hiện quá m
 
 Điều này giúp phát hiện sớm các nguồn nhiễm có thể ảnh hưởng đến kết quả phân tích.
 
----
 
 ## 3. Tối ưu hóa phân phối GC
 
@@ -52,7 +47,6 @@ SOAP đánh giá **hàm lượng GC** của thư viện:
 
 và so sánh với **mô hình phân phối chuẩn lý thuyết của sinh vật mục tiêu**, từ đó phát hiện các nguồn DNA lạ hoặc sai lệch trong quá trình chuẩn bị thư viện.
 
----
 
 ## 4. Phân tích K-mer và Định kiến vị trí
 
@@ -64,7 +58,6 @@ Phân tích này giúp:
 - Xác định **định kiến mồi (primer bias)**
 - Nhận diện **adapter chưa được cắt bỏ**
 
----
 
 # Công nghệ sử dụng
 
@@ -93,7 +86,6 @@ Dự án được xây dựng dựa trên các tiêu chuẩn hiện đại về 
 - Cloudflare DNS  
 - GitHub Actions (CI/CD tự động)
 
----
 
 # Cài đặt và Sử dụng
 
@@ -106,7 +98,6 @@ Tài liệu bao gồm:
 - Xuất báo cáo HTML
 - Tích hợp vào pipeline NGS
 
----
 
 # Đóng góp và Liên hệ
 
@@ -117,15 +108,8 @@ Nếu bạn phát hiện lỗi hoặc có ý tưởng cải tiến, vui lòng:
 - Mở một **Issue** trong kho mã nguồn
 - Gửi **Pull Request** cho các tính năng mới
 
-Hoặc liên hệ trực tiếp qua email:
+Hoặc liên hệ trực tiếp qua email: `dzokha1010@gmail.com`
 
-```
-
-[dzokha1010@gmail.com](mailto:dzokha1010@gmail.com)
-
-```
-
----
 
 # Tác giả
 
@@ -133,5 +117,7 @@ Dự án được duy trì và phát triển bởi:
 
 **Nguyễn Văn Kha**  
 Chuyên viên, Phòng Sở hữu trí tuệ
+
 Sở Khoa học và Công nghệ TP. Cần Thơ
+
 Việt Nam
