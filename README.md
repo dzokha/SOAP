@@ -1,4 +1,3 @@
-```md
 # SOAP: Sequence Optimization and Alignment Program
 
 ## Giải pháp toàn diện về Kiểm soát chất lượng (QC) và Phân tích trình tự DNA
@@ -135,7 +134,8 @@ Dự án được duy trì và phát triển bởi:
 **Nguyen Van Kha**  
 Chuyên viên Công nghệ thông tin  
 Cần Thơ, Việt Nam
-```
+
+
 
 
 # SOAP
