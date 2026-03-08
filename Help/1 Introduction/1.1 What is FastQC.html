@@ -1,36 +1,10 @@
-<html>
+# FastQC là gì?
 
-<head>
-<title>What is FastQC?</title>
-<style type="text/css">
-	body {
-		font-family: sans-serif;
-	}
-</style>
-</head>
-<body>
-<h1>What is FastQC</h1>
-<p>
-Modern high throughput sequencers can generate hundreds of millions of sequences
-in a single run.  Before analysing this sequence to draw biological conclusions
-you should always perform some simple quality control checks to ensure that
-the raw data looks good and there are no problems or biases in your data which
-may affect how you can usefully use it.
-</p>
-<p>
-Most sequencers will generate a QC report as part of their analysis pipeline, 
-but this is usually only focused on identifying problems which were generated
-by the sequencer itself.  FastQC aims to provide a QC report which can spot
-problems which originate either in the sequencer or in the starting library
-material.
-</p>
-<p>
-FastQC can be run in one of two modes.  It can either run as a stand alone
-interactive application for the immediate analysis of small numbers of FastQ
-files, or it can be run in a non-interactive mode where it would be suitable
-for integrating into a larger analysis pipeline for the systematic processing
- of large numbers of files.
- </p>
-</body>
+Các máy giải trình tự hiệu năng cao (high throughput) hiện đại có thể tạo ra hàng trăm triệu trình tự chỉ trong một lần chạy duy nhất. Trước khi phân tích các trình tự này để đưa ra các kết luận sinh học, bạn luôn nên thực hiện một số bước kiểm tra chất lượng đơn giản. Việc này nhằm đảm bảo dữ liệu thô đạt yêu cầu và không có vấn đề hoặc sai lệch (bias) nào có thể ảnh hưởng đến hiệu quả sử dụng dữ liệu của bạn.
 
-</html>
+Hầu hết các máy giải trình tự sẽ tạo ra một báo cáo QC (kiểm soát chất lượng) như một phần trong quy trình phân tích của chúng, nhưng các báo cáo này thường chỉ tập trung vào việc xác định các lỗi do chính máy giải trình tự gây ra. FastQC hướng tới việc cung cấp một báo cáo QC có khả năng phát hiện các vấn đề bắt nguồn từ cả máy giải trình tự lẫn vật liệu thư viện mẫu ban đầu.
+
+FastQC có thể được vận hành ở một trong hai chế độ:
+
+- **Chế độ ứng dụng tương tác độc lập**: Phù hợp để phân tích ngay lập tức một số lượng nhỏ các tệp FastQ.
+- **Chế độ không tương tác**: Phù hợp để tích hợp vào các quy trình phân tích (pipeline) lớn hơn nhằm xử lý hệ thống một lượng lớn các tệp tin.
