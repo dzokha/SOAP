@@ -97,8 +97,8 @@ Giúp phát hiện:
 ### 1. Clone dự án
 
 ```bash
-git clone https://github.com/your-username/SOAP.git
-cd SOAP
+git clone https://github.com/dzokha/soap.git
+cd soap
 ```
 
 ---
@@ -107,14 +107,14 @@ cd SOAP
 
 ```bash
 # Cấp quyền (Linux/Mac)
-chmod +x mvnw
+chmod +x mvn
 
 # Build và chạy
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 👉 Backend chạy tại:
-`http://localhost:8888`
+`http://localhost:2026`
 
 ---
 
