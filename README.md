@@ -161,7 +161,9 @@ Xem chi tiết tại file `LICENSE`.
 ## 👨‍💻 Tác giả
 
 **Nguyễn Văn Kha**
+
 Chuyên viên – Phòng Sở hữu trí tuệ
+
 Sở Khoa học và Công nghệ TP. Cần Thơ, Việt Nam
 
 📫 Email: [dzokha1010@gmail.com](mailto:dzokha1010@gmail.com)
