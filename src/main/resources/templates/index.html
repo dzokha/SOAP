@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOAP - Phage Genomics Pipeline</title>
+    
+    <!-- Tailwind CSS (thay thế cho soap.css cũ) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Các CSS đặc thù không dùng được bằng Tailwind */
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* Spinner Loader Custom */
+        .spinner {
+            display: none;
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6; /* Tailwind blue-500 */
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* D3 Chart Styles */
+        svg .line { fill: none; stroke-width: 2; }
+        svg .axis-label { font-size: 12px; fill: #64748b; }
+        
+        /* Modal Animation */
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-animate { animation: slideDown 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-slate-200 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-dna text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 leading-tight">SOAP Workspace</h1>
+                    <p class="text-xs text-slate-500 font-medium">Sequence Optimization and Analysis Pipeline</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-medium px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">
+                    <i class="fa-solid fa-server mr-1"></i> Java Backend Ready
+                </span>
+                <button id="openHelp" class="text-slate-500 hover:text-blue-600 transition-colors">
+                    <i class="fa-regular fa-circle-question text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden max-w-7xl mx-auto w-full">
+        
+        <!-- Sidebar Navigation (Pipeline Steps) -->
+        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col py-6 overflow-y-auto hidden md:flex">
+            <div class="px-6 mb-4">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Quy trình phân tích Phage</h2>
+            </div>
+            <nav class="flex-1 px-4 space-y-1">
+                <!-- Step 1: Raw QC -->
+                <button onclick="switchTab('tab-qc1')" id="btn-tab-qc1" class="tab-btn w-full flex items-center gap-3 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl font-semibold transition-all">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">1</div>
+                    <div class="text-left">
+                        <div class="text-sm">Raw Data QC</div>
+                        <div class="text-xs font-normal opacity-80">FastQC Analysis</div>
+                    </div>
+                </button>
+
+                <!-- Step 2: Trimming -->
+                <button onclick="switchTab('tab-trim')" id="btn-tab-trim" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition-all">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500">2</div>
+                    <div class="text-left">
+                        <div class="text-sm">Trimming</div>
+                        <div class="text-xs font-normal opacity-80">Trim Galore</div>
+                    </div>
+                </button>
+
+                <!-- Step 3: Re-QC -->
+                <button onclick="switchTab('tab-qc2')" id="btn-tab-qc2" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition-all">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500">3</div>
+                    <div class="text-left">
+                        <div class="text-sm">Clean QC</div>
+                        <div class="text-xs font-normal opacity-80">Post-trimming Check</div>
+                    </div>
+                </button>
+
+                <!-- Step 4: Assembly -->
+                <button onclick="switchTab('tab-assembly')" id="btn-tab-assembly" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition-all">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500">4</div>
+                    <div class="text-left">
+                        <div class="text-sm">Assembly</div>
+                        <div class="text-xs font-normal opacity-80">Unicycler / SPAdes</div>
+                    </div>
+                </button>
+
+                <!-- Step 5: Annotation -->
+                <button onclick="switchTab('tab-annotation')" id="btn-tab-annotation" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl font-medium transition-all">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500">5</div>
+                    <div class="text-left">
+                        <div class="text-sm">Annotation</div>
+                        <div class="text-xs font-normal opacity-80">Pharokka</div>
+                    </div>
+                </button>
+            </nav>
+            <div class="px-6 mt-auto">
+                <button class="w-full bg-slate-900 text-white py-3 rounded-xl font-semibold hover:bg-slate-800 transition shadow-lg shadow-slate-200">
+                    <i class="fa-solid fa-play mr-2"></i> Run Full Pipeline
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50">
+            
+            <!-- ========================================== -->
+            <!-- TAB 1: RAW QC (Code hiện tại của bạn)      -->
+            <!-- ========================================== -->
+            <div id="tab-qc1" class="tab-content block max-w-4xl mx-auto space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Bước 1: Quality Control (QC)</h2>
+                    <p class="text-slate-500">Kiểm tra chất lượng dữ liệu thô từ máy giải trình tự (Illumina) trước khi xử lý.</p>
+                </div>
+
+                <!-- Box Upload -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center transition-all hover:border-blue-400 hover:shadow-md">
+                    <input type="file" id="fileInput" multiple accept=".fastq,.fq,.gz" class="hidden">
+                    <label for="fileInput" class="cursor-pointer block">
+                        <div class="w-20 h-20 mx-auto bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-800 mb-1">Kéo thả file vào đây hoặc Nhấn để chọn</h3>
+                        <p class="text-sm text-slate-500 mb-4">Hỗ trợ các định dạng: .fastq, .fq, .fq.gz</p>
+                    </label>
+                    <div id="file-list" class="flex flex-wrap justify-center gap-2 mt-4 text-sm"></div>
+                    
+                    <button id="analyzeBtn" onclick="uploadFile()" class="mt-6 px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95 disabled:bg-slate-300 disabled:cursor-not-allowed disabled:shadow-none">
+                        <i class="fa-solid fa-chart-line mr-2"></i> Bắt đầu phân tích (QC)
+                    </button>
+                    <div id="spinner" class="spinner"></div>
+                    <div id="result-status" class="mt-4 font-semibold text-blue-600 hidden"></div>
+                </div>
+
+                <!-- Khu vực hiển thị biểu đồ -->
+                <div id="chart-area" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] relative flex flex-col">
+                    <div id="placeholder-text" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-chart-pie text-5xl mb-3 opacity-50"></i>
+                        <p class="font-medium">Kết quả phân tích FastQC sẽ hiển thị tại đây</p>
+                    </div>
+                    
+                    <!-- Container cho logic JS sinh ra báo cáo -->
+                    <div id="gc-chart-container" class="w-full relative z-10"></div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB 2: TRIMMING (Mockup cho tương lai)     -->
+            <!-- ========================================== -->
+            <div id="tab-trim" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Bước 2: Trimming (Làm sạch dữ liệu)</h2>
+                    <p class="text-slate-500">Sử dụng thuật toán Trim Galore để cắt bỏ Adapter và lọc các base kém chất lượng.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-lg border-b pb-3 mb-5"><i class="fa-solid fa-scissors mr-2 text-slate-400"></i>Cấu hình Trim Galore</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Quality Phred Score cutoff</label>
+                            <input type="range" min="10" max="30" value="20" class="w-full accent-blue-600">
+                            <div class="flex justify-between text-xs text-slate-400 mt-1"><span>10</span><span>Mặc định: 20</span><span>30</span></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Độ dài đoạn đọc tối thiểu (Minimum Length)</label>
+                            <input type="number" value="35" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="flex items-center space-x-3 text-slate-700">
+                            <input type="checkbox" checked class="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium">Tự động phát hiện và cắt Illumina Adapters</span>
+                        </label>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t flex justify-end">
+                        <button class="px-6 py-2.5 bg-slate-800 text-white font-semibold rounded-lg hover:bg-slate-700 transition">Tiến hành Trimming</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB 4: ASSEMBLY (Mockup cho tương lai)     -->
+            <!-- ========================================== -->
+            <div id="tab-assembly" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Bước 4: Genome Assembly</h2>
+                    <p class="text-slate-500">Lắp ráp các đoạn đọc ngắn thành bộ gene hoàn chỉnh (Scaffolds/Circular).</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <label class="block text-sm font-semibold text-slate-700 mb-4">Lựa chọn thuật toán lắp ráp (Assembler):</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <label class="relative border-2 border-blue-500 bg-blue-50 p-4 rounded-xl cursor-pointer flex items-start gap-3">
+                            <input type="radio" name="assembler" checked class="mt-1">
+                            <div>
+                                <span class="block font-bold text-blue-800">Unicycler</span>
+                                <span class="text-sm text-blue-600/80">Tối ưu cho vi khuẩn và Phage. Cố gắng tạo bộ gene dạng vòng tròn (Circular).</span>
+                            </div>
+                        </label>
+                        <label class="relative border-2 border-slate-200 hover:border-slate-300 p-4 rounded-xl cursor-pointer flex items-start gap-3 transition">
+                            <input type="radio" name="assembler" class="mt-1">
+                            <div>
+                                <span class="block font-bold text-slate-700">SPAdes</span>
+                                <span class="text-sm text-slate-500">Thuật toán đa dụng, độ chính xác cao cho các bộ gene phức tạp.</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="flex justify-end">
+                        <button class="px-6 py-2.5 bg-slate-800 text-white font-semibold rounded-lg hover:bg-slate-700 transition">Bắt đầu Lắp ráp</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TAB 5: ANNOTATION (Mockup cho tương lai)   -->
+            <!-- ========================================== -->
+            <div id="tab-annotation" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800">Bước 5: Chú giải bộ gene (Annotation)</h2>
+                    <p class="text-slate-500">Sử dụng Pharokka để tìm kiếm và định danh các gene (CDS, tRNA) trong hệ gene Phage.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <i class="fa-solid fa-tags text-6xl text-emerald-400 mb-4"></i>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Pharokka Annotation Engine</h3>
+                    <p class="text-slate-600 mb-6 max-w-lg mx-auto">Đầu vào của quá trình này là file Fasta (.fasta) đã được lắp ráp từ bước Assembly. Kết quả sẽ được xuất ra định dạng GenBank (.gbk) chuẩn NCBI.</p>
+                    <button class="px-8 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                        Chạy Pharokka
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm modal-overlay"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-white rounded-2xl shadow-2xl modal-animate overflow-hidden">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center text-white">
+                <h2 class="font-bold text-lg"><i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn sử dụng Pipeline</h2>
+                <button class="close-modal hover:text-blue-200 text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 text-slate-600 space-y-4 max-h-[70vh] overflow-y-auto">
+                <p>Hệ thống SOAP được thiết kế theo quy trình chuẩn cho phân tích Phage:</p>
+                <ol class="list-decimal pl-5 space-y-2 text-sm">
+                    <li><strong>Kiểm soát chất lượng (QC):</strong> Upload file `.fastq.gz` để FastQC kiểm tra độ dài, GC content và Adapter.</li>
+                    <li><strong>Làm sạch (Trimming):</strong> Trim Galore sẽ cắt bỏ đầu mồi và base lỗi.</li>
+                    <li><strong>Lắp ráp (Assembly):</strong> Chạy Unicycler để tạo bộ gene vòng (Circular genome).</li>
+                    <li><strong>Chú giải (Annotation):</strong> Pharokka phân tích và dán nhãn các gene.</li>
+                    <li><strong>Xuất dữ liệu:</strong> Tải file <code>.gbk</code> để xem bản đồ trên SnapGene.</li>
+                </ol>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 border-t flex justify-end">
+                <button id="closeHelpBtn" class="px-5 py-2 bg-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-300 transition">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script th:inline="javascript">
+        // --- Logic Chuyển Tab (Stepper) ---
+        function switchTab(tabId) {
+            // Ẩn tất cả nội dung
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Xóa style active của tất cả nút
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-blue-50', 'text-blue-700');
+                el.classList.add('text-slate-600', 'hover:bg-slate-50');
+                el.querySelector('div').classList.remove('bg-blue-100', 'text-blue-600');
+                el.querySelector('div').classList.add('bg-slate-100', 'text-slate-500');
+            });
+
+            // Hiển thị nội dung tương ứng
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Đổi style active cho nút được chọn
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-blue-50', 'text-blue-700');
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-50');
+            activeBtn.querySelector('div').classList.add('bg-blue-100', 'text-blue-600');
+            activeBtn.querySelector('div').classList.remove('bg-slate-100', 'text-slate-500');
+        }
+
+        // --- Logic Xử lý File & AJAX (Giữ nguyên của Backend) ---
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileList = document.getElementById('file-list');
+            if(this.files.length > 0) {
+                fileList.innerHTML = Array.from(this.files).map(f => 
+                    `<span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200 m-1"><i class="fa-solid fa-file-lines mr-1"></i>${f.name}</span>`
+                ).join('');
+            } else {
+                fileList.innerHTML = '';
+            }
+        });
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result-status');
+            const btn = document.getElementById('analyzeBtn');
+            const spinner = document.getElementById('spinner');
+            const placeholder = document.getElementById('placeholder-text');
+            const chartContainer = document.getElementById('gc-chart-container');
+
+            if (fileInput.files.length === 0) return alert("Vui lòng chọn ít nhất một file!");
+
+            const formData = new FormData();
+            Array.from(fileInput.files).forEach(file => formData.append("files", file));
+
+            btn.disabled = true;
+            spinner.style.display = "block";
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Hệ thống đang phân tích...`;
+            chartContainer.innerHTML = ""; 
+            placeholder.style.display = "flex";
+
+            try {
+                // Endpoint Spring Boot của bạn
+                const response = await fetch('/api/v1/soap/analyze', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error("Lỗi Server: " + response.status);
+
+                const data = await response.json();
+                console.log("Dữ liệu nhận được:", data);
+
+                placeholder.style.display = "none";
+                resultDiv.innerHTML = `<i class="fa-solid fa-check text-emerald-500 mr-2"></i> Hoàn tất phân tích ${data.length} file.`;
+
+                data.forEach((report, index) => {
+                    const sectionId = `report-section-${index}`;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'bg-white border border-slate-200 rounded-xl p-6 mb-8 shadow-sm';
+                    
+                    div.innerHTML = `
+                        <h3 class="text-lg font-bold text-slate-800 border-l-4 border-blue-500 pl-3 mb-6">
+                            ${report.fileName}
+                        </h3>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4"><i class="fa-solid fa-chart-bar mr-2"></i>1. Per Base Sequence Quality</h4>
+                            <div id="quality-${sectionId}" class="w-full overflow-x-auto min-h-[200px] border border-slate-100 rounded bg-slate-50/50 p-2"></div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4"><i class="fa-solid fa-chart-line mr-2"></i>2. Adapter Content</h4>
+                            <div id="adapter-${sectionId}" class="w-full overflow-x-auto min-h-[200px] border border-slate-100 rounded bg-slate-50/50 p-2"></div>
+                        </div>
+                    `;
+                    chartContainer.appendChild(div);
+
+                    // Gọi hàm vẽ biểu đồ từ chart-logic.js
+                    if (report.perBaseQualityData && report.perBaseQualityData.length > 0) {
+                        if (typeof drawPerBaseQualityChart === "function") {
+                            drawPerBaseQualityChart(`#quality-${sectionId}`, report.perBaseQualityData);
+                        }
+                    } else {
+                        document.getElementById(`quality-${sectionId}`).innerHTML = "<p class='text-slate-400 text-sm text-center mt-10'>Không có dữ liệu Quality.</p>";
+                    }
+
+                    if (report.adapterData && report.adapterData.length > 0) {
+                        if (typeof drawAdapterChart === "function") {
+                            drawAdapterChart(`#adapter-${sectionId}`, report.adapterData);
+                        }
+                    } else {
+                        document.getElementById(`adapter-${sectionId}`).innerHTML = "<div class='text-center mt-10'><span class='bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-medium'><i class='fa-solid fa-check-circle mr-1'></i> Trình tự sạch, không phát hiện Adapter.</span></div>";
+                    }
+                });
+
+            } catch (error) {
+                resultDiv.innerText = "Lỗi: " + error.message;
+                resultDiv.classList.replace('text-blue-600', 'text-red-500');
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = "none";
+            }
+        }
+
+        // --- Logic Modal Help ---
+        const modal = document.getElementById("helpModal");
+        const openBtn = document.getElementById("openHelp");
+        const closeModal = () => modal.classList.add("hidden");
+        
+        openBtn.onclick = () => modal.classList.remove("hidden");
+        document.querySelector(".close-modal").onclick = closeModal;
+        document.getElementById("closeHelpBtn").onclick = closeModal;
+        document.querySelector(".modal-overlay").onclick = closeModal;
+    </script>
+
+    <!-- Script vẽ biểu đồ D3.js do Spring Boot cung cấp -->
+    <script th:src="@{/js/chart-logic.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+/* soap.css */
+body { 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    padding: 40px; 
+    background-color: #f4f7f6; 
+    color: #333; 
+    line-height: 1.6;
+}
+
+.container { 
+    max-width: 1000px; 
+    margin: auto; 
+    background: white; 
+    padding: 40px; 
+    border-radius: 16px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 { 
+    color: #2c3e50; 
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.upload-box { 
+    border: 2px dashed #3498db; 
+    padding: 40px; 
+    border-radius: 12px; 
+    background: #f8fafc; 
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.upload-box:hover { 
+    border-color: #2980b9; 
+    background: #f1f5f9; 
+}
+
+.file-list-preview {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+button { 
+    background: #3498db; 
+    color: white; 
+    border: none; 
+    padding: 12px 30px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: 600;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+    transition: transform 0.1s;
+}
+
+button:active { transform: scale(0.98); }
+
+button:disabled { 
+    background: #bdc3c7; 
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.help-btn {
+    background: #2ecc71;
+    font-size: 14px;
+    padding: 8px 15px;
+}
+
+#result-status { 
+    margin-top: 25px; 
+    font-weight: 600; 
+    color: #2c3e50;
+    text-align: center;
+}
+
+#chart-area { 
+    margin-top: 30px; 
+    min-height: 450px; 
+    background: #ffffff; 
+    border: 1px solid #edf2f7; 
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #bdc3c7;
+}
+
+.spinner { 
+    display: none; 
+    margin: 20px auto; 
+    width: 35px; 
+    height: 35px; 
+    border: 3.5px solid #f3f3f3; 
+    border-top: 3.5px solid #3498db; 
+    border-radius: 50%; 
+    animation: spin 0.8s linear infinite; 
+}
+
+@keyframes spin { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+}
+
+/* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    border-radius: 12px;
+    width: 50%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease-out;
+    overflow: hidden;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    padding: 15px 20px;
+    background: #3498db;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body { padding: 20px; line-height: 1.6; }
+
+.close-modal { font-size: 28px; font-weight: bold; cursor: pointer; }
+
+.btn-close-footer {
+    background: #95a5a6;
+    margin: 10px 20px 20px;
+    float: right;
+}
+
+/* Bổ sung cho soap.css */
+.badge {
+    background: #ebf5ff;
+    color: #3182ce;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-right: 5px;
+    border: 1px solid #bee3f8;
+}
+
+.file-report-card {
+    width: 100%;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #f0f4f8;
+}
+
+.file-report-card h3 {
+    font-size: 1.1em;
+    color: #2d3748;
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+}
+
+svg .line {
+    fill: none;
+    stroke-width: 2;
+}
+
+svg .axis-label {
+    font-size: 12px;
+    fill: #718096;
+}

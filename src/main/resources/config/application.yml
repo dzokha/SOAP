@@ -1,0 +1,69 @@
+# ===============================================================
+# Cấu hình Hệ thống Spring Boot
+# ===============================================================
+spring:
+  application:
+    name: SOAP
+
+  main:
+    banner-mode: "off"
+  
+  # Cấu hình upload file
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1GB
+      max-request-size: 2GB
+      file-size-threshold: 2KB
+
+# ===============================================================
+# Cấu hình Server & Java
+# ===============================================================
+server:
+  port: 2026
+
+java:
+  awt:
+    headless: true
+
+# ===============================================================
+# Cấu hình Swagger (OpenAPI) cho Spring Boot 3
+# ===============================================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operationsSorter: alpha
+    # Giúp ghi nhớ các tham số test trên giao diện
+    display-request-duration: true 
+
+# ===============================================================
+# Cấu hình tùy chỉnh cho Logic SOAP (Ánh xạ vào SOAPProperties.java)
+# ===============================================================
+soap:
+  upload-dir: "data/uploads"
+  report-dir: "data/reports"
+  raw-dir: "data/raws"
+  max-file-size: 104857600 # 100MB (Giới hạn logic riêng nếu cần)
+  thread-count: 4
+  logging:
+    level: "INFO"
+    path: "logs/soap"
+  qc-thresholds:
+    error-threshold: 0.2
+    warning-threshold: 0.1
+  analysis:
+    kmer-size: 7
+    min-length: 50
+    dup-length: 50
+    casava: false
+    nofilter: false
+    nogroup: false
+    expgroup: false
+    svg-output: false
+    ignore-sequence-length: true  # Hoặc false tùy nhu cầu
+    sequence-format: null
+    adapter-file: classpath:data/adapter_list.txt
+    contaminant-file: classpath:data/contaminant_list.txt
+    limits-file: classpath:data/limits.txt

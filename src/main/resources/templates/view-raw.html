@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOAP - DNA Sequence Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .raw-viewer {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-blue-400 mb-2">SOAP Analysis System</h1>
+            <p class="text-gray-400">Phân tích chất lượng trình tự DNA (Java 21/25 Backend)</p>
+        </header>
+
+        <section class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 border border-gray-700">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <span class="mr-2">🔍</span> Xem dữ liệu thô (.fq.gz)
+            </h2>
+            <div class="flex flex-wrap gap-4 items-end">
+                <div class="flex-1 min-w-[250px]">
+                    <label class="block text-sm text-gray-400 mb-1">Chọn file FASTQ</label>
+                    <input type="file" id="rawFile" class="w-full bg-gray-700 border border-gray-600 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div class="w-24">
+                    <label class="block text-sm text-gray-400 mb-1">Số đoạn</label>
+                    <input type="number" id="limit" value="5" class="w-full bg-gray-700 border border-gray-600 p-2 rounded outline-none">
+                </div>
+                <button onclick="viewRawData()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium transition">
+                    Xem nội dung
+                </button>
+            </div>
+
+            <div id="rawOutputContainer" class="mt-6 hidden">
+                <h3 class="text-sm font-bold text-gray-400 mb-2 uppercase">Kết quả trích xuất:</h3>
+                <div id="rawOutput" class="raw-viewer"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8888/api/v1/soap"; // Thay đổi port nếu cần
+
+        async function viewRawData() {
+            const fileInput = document.getElementById('rawFile');
+            const limit = document.getElementById('limit').value;
+            const outputContainer = document.getElementById('rawOutputContainer');
+            const outputDiv = document.getElementById('rawOutput');
+
+            if (!fileInput.files[0]) {
+                alert("Vui lòng chọn một file .gz!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            outputDiv.innerText = "Đang đọc file...";
+            outputContainer.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/view-raw?limit=${limit}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const text = await response.text();
+                outputDiv.innerText = text;
+            } catch (error) {
+                outputDiv.innerText = "Lỗi kết nối Server: " + error.message;
+            }
+        }
+
+        async function analyzeDNA() {
+            const fileInput = document.getElementById('analyzeFiles');
+            const resultsDiv = document.getElementById('analysisResults');
+
+            if (fileInput.files.length === 0) {
+                alert("Vui lòng chọn ít nhất một file!");
+                return;
+            }
+
+            const formData = new FormData();
+            for (let file of fileInput.files) {
+                formData.append("files", file);
+            }
+
+            resultsDiv.innerHTML = `<div class="text-yellow-500 animate-pulse">Hệ thống đang xử lý đa luồng... Vui lòng đợi.</div>`;
+
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = data.map(res => `
+                    <div class="bg-gray-700 p-4 rounded border-l-4 ${res.status === 'SUCCESS' ? 'border-green-500' : 'border-red-500'}">
+                        <div class="font-bold">${res.fileName}</div>
+                        <div class="text-sm text-gray-400">Trạng thái: ${res.status}</div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="text-red-500">Lỗi phân tích: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
